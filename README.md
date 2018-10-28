@@ -1,2 +1,2 @@
-# deltascript
-dat language tho
+# dltscript
+Dat Language Tho

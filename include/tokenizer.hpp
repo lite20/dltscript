@@ -12,6 +12,22 @@
 
 namespace tokenizer
 {
+    // stucture of a token holds identifier, line, and position
+    struct token
+    {
+        std::string id;
+
+        int line;
+        int pos;
+
+        token(std::string i, int l, int p)
+        {
+            id = i;
+            line = l;
+            pos = p;
+        }
+    };
+
     class full
     {
     private:
@@ -32,7 +48,7 @@ namespace tokenizer
         std::ifstream inFile;
 
         // vector of tokens
-        std::vector<std::string> tokens;
+        std::vector<token*> tokens;
 
         // buffer for tokens being constructed
         std::stringstream token_buffer;
@@ -40,6 +56,9 @@ namespace tokenizer
         // holds current line during parsing, and final
         // line count after
         int lines = 0;
+
+        // holds current cursor position
+        int pos = 0;
 
     private:
         // push a token to the token vector and clear string stream
@@ -52,7 +71,9 @@ namespace tokenizer
                 return;
             }
 
-            tokens.push_back(token_buffer.str());
+            // construct new token and add it. we subtract buffered from pos
+            // to get the start of the term.
+            tokens.push_back(new token(token_buffer.str(), lines, pos - buffered));
             token_buffer.str(std::string());
 
             // buffered will have 1 added so -1
@@ -116,6 +137,9 @@ namespace tokenizer
                 {
                     push_token();
                     lines++;
+
+                    // reset pos to -1 as it will be incremented in this loop
+                    pos = -1;
                 }
 
                 // put the single character operators alone
@@ -181,6 +205,8 @@ namespace tokenizer
                 // increment tally of buffered characters
                 buffered++;
             }
+
+            pos++;
         }
     };
 }
